@@ -20,7 +20,7 @@ def main():
 
 
     assert out == ['209.0/0.0', '209.0/0.0', '0.0/0.0']
-    # Explaination:
+    # Explanation:
     #   When initial order with ID abbb11 is added, the price is the best Bid price as it is  the only order.
     #   The quantity of order ID abbb11 is amended in the next run, but the prices remain unchanged.
     #   Order ID abbb11 is cancelled, resulting in no order to traverse to calculate bid/ask price, hence  0.0/0.0.
@@ -38,7 +38,7 @@ def main():
             logging.info(orderItem)
 
     assert out == ['209.0/0.0', '209.0/210.0', '209.0/210.0', '209.0/210.0', '0.0/210.0']
-    # Explaination:
+    # Explanation:
     #   When initial order with ID abbb11 is added, the price is the best Bid price as it is  the only order.
     #   When order abbb12 ia added, its price is the best ask price as only ask order.
     #   The quantity of order ID abbb11 is amended in the next run, but the prices remain unchanged.

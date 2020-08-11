@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from Order import Order
-from Utils.constants import orderKeysAdd, orderKeys
+from Utils.constants import orderKeysAdd, orderKeys, BuySell
 from Utils.errors import customValueError
 
 
@@ -33,7 +33,7 @@ class OrderBook(object):
         for order in self.orders.values():
             if order.ticker == ticker and order.side == 'B':
                 bidPrice.append(order.price)
-        return str(max(bidPrice,default=0.0))
+        return str(max(bidPrice, default=0.0))
 
     def minAsk(self, ticker):
         """
@@ -43,7 +43,7 @@ class OrderBook(object):
         for order in self.orders.values():
             if order.ticker == ticker and order.side == 'S':
                 askPrice.append(order.price)
-        return str(min(askPrice,default=0.0))
+        return str(min(askPrice, default=0.0))
 
     def _updateOrder(self, lOrder):
         """
@@ -54,7 +54,7 @@ class OrderBook(object):
         # The unpolished code is to allow update of most fields
         if len(lOrder) > len(orderKeys) - 1:  # If there are any fields to update
             for n in lOrder[len(orderKeys):]:
-                if n in ['B', 'S']:  # If it is B/S, it is a side.
+                if n in BuySell:  # If it is B/S, it is a side.
                     dictOrderUpdate['side'] = n
                 elif n.isalpha():  # If it is alpha, it is a ticker.
                     dictOrderUpdate['ticker'] = n

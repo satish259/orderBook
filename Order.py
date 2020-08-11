@@ -1,4 +1,5 @@
 # coding=utf-8
+from Utils.constants import BuySell
 from Utils.errors import customValueError
 
 
@@ -28,7 +29,7 @@ class Order(object):
         """
         Set side attribute of order. Can be B for Buy or S for Sell only.
         """
-        if value in ['B', 'S']:
+        if value in BuySell:
             self._side = value
         else:
             customValueError('side', value, 'B for Buy or S for Sell are the allowable values.')
