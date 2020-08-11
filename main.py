@@ -9,9 +9,15 @@ def main():
     out = []
     ob = OrderBook()
     dataStream = ['1568390243|abbb11|a|AAPL|B|209.00000|100', '1568390244|abbb11|u|101', '1568390245|abbb11|c']
+    logging.info("---------------------Start of Test 1--------------------")
     for data in dataStream:
         processOrder(ob, data)
         out.append(getBestBidAndAsk(ob, 'AAPL'))
+        logging.info('Processed :' + data)
+        logging.info('Order Book contains...')
+        for _, order in ob.orders.items():
+            logging.info(order)
+
 
     assert out == ['209.0/0.0', '209.0/0.0', '0.0/0.0']
     # Explaination:
@@ -22,9 +28,14 @@ def main():
     out = []
     orders = ['1568390201|abbb11|a|AAPL|B|209.00000|100', '1568390202|abbb12|a|AAPL|S|210.00000|10',
               '1568390204|abbb11|u|10', '1568390203|abbb12|u|101', '1568390243|abbb11|c']
+    logging.info("--------------------Start of Test 2--------------------")
     for order in orders:
         processOrder(ob, order)
         out.append(getBestBidAndAsk(ob, 'AAPL'))
+        logging.info('Processed :' + order)
+        logging.info('Order Book contains...')
+        for _, orderItem in ob.orders.items():
+            logging.info(orderItem)
 
     assert out == ['209.0/0.0', '209.0/210.0', '209.0/210.0', '209.0/210.0', '0.0/210.0']
     # Explaination:
