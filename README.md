@@ -20,7 +20,8 @@ or
 
 ## History
 2020-08-03 [Initial release](https://github.com/satish259/orderBook/commit/e799584601bf9d6e1365673225c8c6b63a4f1c88)
-2020-08-11 [Updated implementation] https://github.com/satish259/orderBook/archive/master.zip
+
+2020-08-11 [Updated implementation](https://github.com/satish259/orderBook/archive/master.zip)
 
 ## Future enhancments suggestions
 1) Add MongoDB on localhost 
