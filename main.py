@@ -17,6 +17,7 @@ def main():
         logging.info('Order Book contains...')
         for _, order in ob.orders.items():
             logging.info(order)
+    logging.info('out :' + ','.join(out))
 
 
     assert out == ['209.0/0.0', '209.0/0.0', '0.0/0.0']
@@ -36,6 +37,7 @@ def main():
         logging.info('Order Book contains...')
         for _, orderItem in ob.orders.items():
             logging.info(orderItem)
+    logging.info('out :' + ','.join(out))
 
     assert out == ['209.0/0.0', '209.0/210.0', '209.0/210.0', '209.0/210.0', '0.0/210.0']
     # Explanation:
