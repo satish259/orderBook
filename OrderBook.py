@@ -1,8 +1,8 @@
 # coding=utf-8
-
 from Order import Order
 from Utils.constants import orderKeysAdd, orderKeys, BuySell
 from Utils.errors import customValueError
+from Utils.db import dbORDERS, addOrder, cancelOrder
 
 
 class OrderBook(object):
@@ -11,13 +11,15 @@ class OrderBook(object):
         self.orders = {}
         self.bidPrices = {}
         self.askPrices = {}
+        self.db=dbORDERS()
 
     def _addOrder(self, order):
         """
         Adds order to orderBook (orders dict)
         """
         self.orders[order.orderId] = order
-        self._safeAddPrice(self._identifyPriceDictionary(order.side),order.ticker,order.price)
+        self._safeAddPrice(self._identifyPriceDictionary(order.side), order.ticker, order.price)
+        addOrder(self.db,order)
 
     def _cancelOrder(self, order):
         """
@@ -25,18 +27,19 @@ class OrderBook(object):
         """
         if order:
             if order.orderId in self.orders:
-                self._safeRemovePrice(self._identifyPriceDictionary(order.side),order.ticker,order.price)
+                self._safeRemovePrice(self._identifyPriceDictionary(order.side), order.ticker, order.price)
                 self.orders.pop(order.orderId)
+                cancelOrder(self.db, order)
             else:  # If order does not exists. One could consider ignoring it.
                 customValueError('orderId', order.orderId, "Unable to cancel order as it does not exist.")
         else:  # If order does not exists. One could consider ignoring it.
-                customValueError('orderId', 'None', "Unable to cancel order as it does not exist.")
+            customValueError('orderId', 'None', "Unable to cancel order as it does not exist.")
 
     def _identifyPriceDictionary(self, side):
         """
         Simple check on side to identify the dictionary to update with price
         """
-        if side=='B':
+        if side == 'B':
             return self.bidPrices
         else:
             return self.askPrices
@@ -45,9 +48,9 @@ class OrderBook(object):
         """
         Add a new price to the ticker list to enable faster return for best bid/ask
         """
-        tickerList = priceDictonary.get(ticker,[])
+        tickerList = priceDictonary.get(ticker, [])
         tickerList.append(price)
-        priceDictonary[ticker]=tickerList
+        priceDictonary[ticker] = tickerList
 
     def _safeRemovePrice(self, priceDictonary, ticker, price):
         """
@@ -62,13 +65,13 @@ class OrderBook(object):
         """
         Max Bid price as best to sell to them.
         """
-        return str(max(self.bidPrices.get(ticker,[]), default=0.0))
+        return str(max(self.bidPrices.get(ticker, []), default=0.0))
 
     def minAsk(self, ticker):
         """
         Min Ask price as best to buy from them.
         """
-        return str(min(self.askPrices.get(ticker,[]), default=0.0))
+        return str(min(self.askPrices.get(ticker, []), default=0.0))
 
     def _updateOrder(self, lOrder):
         """
@@ -109,7 +112,7 @@ class OrderBook(object):
                           dictOrderAdd['side'], dictOrderAdd['price'], dictOrderAdd['quantity'])
             self._addOrder(order)
         elif dictOrder['action'] == 'c':
-            self._cancelOrder(self.orders.get(dictOrder['orderId'],None))
+            self._cancelOrder(self.orders.get(dictOrder['orderId'], None))
         elif dictOrder['action'] == 'u':
             self._updateOrder(data.split('|'))
         else:
