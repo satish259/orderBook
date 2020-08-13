@@ -9,41 +9,66 @@ class OrderBook(object):
 
     def __init__(self):
         self.orders = {}
+        self.bidPrices = {}
+        self.askPrices = {}
 
     def _addOrder(self, order):
         """
         Adds order to orderBook (orders dict)
         """
         self.orders[order.orderId] = order
+        self._safeAddPrice(self._identifyPriceDictionary(order.side),order.ticker,order.price)
 
-    def _cancelOrder(self, orderId):
+    def _cancelOrder(self, order):
         """
         Remove order from orderBook (orders dict)
         """
-        if orderId in self.orders:
-            self.orders.pop(orderId)
+        if order:
+            if order.orderId in self.orders:
+                self._safeRemovePrice(self._identifyPriceDictionary(order.side),order.ticker,order.price)
+                self.orders.pop(order.orderId)
+            else:  # If order does not exists. One could consider ignoring it.
+                customValueError('orderId', order.orderId, "Unable to cancel order as it does not exist.")
         else:  # If order does not exists. One could consider ignoring it.
-            customValueError('orderId', orderId, "Unable to cancel order as it does not exist.")
+                customValueError('orderId', 'None', "Unable to cancel order as it does not exist.")
+
+    def _identifyPriceDictionary(self, side):
+        """
+        Simple check on side to identify the dictionary to update with price
+        """
+        if side=='B':
+            return self.bidPrices
+        else:
+            return self.askPrices
+
+    def _safeAddPrice(self, priceDictonary, ticker, price):
+        """
+        Add a new price to the ticker list to enable faster return for best bid/ask
+        """
+        tickerList = priceDictonary.get(ticker,[])
+        tickerList.append(price)
+        priceDictonary[ticker]=tickerList
+
+    def _safeRemovePrice(self, priceDictonary, ticker, price):
+        """
+        Remove price to the ticker list for cancelled trade
+        """
+        if ticker in priceDictonary:
+            tickerList = priceDictonary[ticker]
+            if price in tickerList:
+                tickerList.remove(price)
 
     def maxBid(self, ticker):
         """
         Max Bid price as best to sell to them.
         """
-        bidPrice = []
-        for order in self.orders.values():
-            if order.ticker == ticker and order.side == 'B':
-                bidPrice.append(order.price)
-        return str(max(bidPrice, default=0.0))
+        return str(max(self.bidPrices.get(ticker,[]), default=0.0))
 
     def minAsk(self, ticker):
         """
         Min Ask price as best to buy from them.
         """
-        askPrice = []
-        for order in self.orders.values():
-            if order.ticker == ticker and order.side == 'S':
-                askPrice.append(order.price)
-        return str(min(askPrice, default=0.0))
+        return str(min(self.askPrices.get(ticker,[]), default=0.0))
 
     def _updateOrder(self, lOrder):
         """
@@ -68,7 +93,7 @@ class OrderBook(object):
                 order = Order(dictOrderUpdate['timestamp'], dictOrderUpdate['orderId'],
                               dictOrderUpdate.get('ticker', None), dictOrderUpdate.get('side', None),
                               dictOrderUpdate.get('price', None), dictOrderUpdate.get('quantity', None), orgOrder)
-                self._cancelOrder(dictOrderUpdate['orderId'])  # Cancel original order
+                self._cancelOrder(orgOrder)  # Cancel original order
                 self._addOrder(order)  # Add new order
             else:  # If order does not exists
                 customValueError('orderId', dictOrderUpdate['orderId'], "Unable to amend order as it does not exist.")
@@ -84,7 +109,7 @@ class OrderBook(object):
                           dictOrderAdd['side'], dictOrderAdd['price'], dictOrderAdd['quantity'])
             self._addOrder(order)
         elif dictOrder['action'] == 'c':
-            self._cancelOrder(dictOrder['orderId'])
+            self._cancelOrder(self.orders.get(dictOrder['orderId'],None))
         elif dictOrder['action'] == 'u':
             self._updateOrder(data.split('|'))
         else:

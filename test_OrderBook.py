@@ -20,10 +20,10 @@ def test__cancel_order():
     This is a perfect case!
     Order gets cancelled properly.
     """
-    processOrder(ob, '1568390243|abbb11|a|AAPL|B|209.00000|100')
+    processOrder(ob, '1568390243|abbb114|a|AAPL1|B|209.00000|100')
     # Intentional incorrect cancel order as other colmns are ignores
-    processOrder(ob, '1568390245|abbb11|c|AAPL|B|209.00000|100')
-    assert getBestBidAndAsk(ob, 'AAPL') == '0.0/0.0'
+    processOrder(ob, '1568390245|abbb114|c|AAPL1|B|209.00000|100')
+    assert getBestBidAndAsk(ob, 'AAPL1') == '0.0/0.0'
 
 
 def test__cancel_order_error():
@@ -32,8 +32,8 @@ def test__cancel_order_error():
     I choose to throw an error but the code can be changed to ignore it too!
     """
     with pytest.raises(ValueError,
-                       match="Incorrect/invalid orderId with value abbb11. Unable to cancel order as it does not exist."):
-        processOrder(ob, '1568390247|abbb11|c|AAPL|B|209.00000|100')
+                       match="Incorrect/invalid orderId with value None. Unable to cancel order as it does not exist."):
+        processOrder(ob, '1568390247|abbb112345|c|AAPL|B|209.00000|100')
 
 
 def test_max_bid_ask():
@@ -70,3 +70,4 @@ def test_process_order_error():
     with pytest.raises(ValueError,
                        match="Incorrect/invalid action with value K. a, u and c are the allowable actions."):
         processOrder(ob, '1568390243|abbb11|K')
+
