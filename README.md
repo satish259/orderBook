@@ -24,9 +24,9 @@ or
 2020-08-11 [Updated implementation](https://github.com/satish259/orderBook/archive/master.zip)
 
 ## Future enhancments suggestions
-1) Add MongoDB on localhost 
-2) Add Celery to add/update/cancel order
-3) Identify possible arbitrage scenarios based on quantity and priced
+1) If speed of getBestBidAndAsk becomes an issue due to length of list, a numpy array of dtype float (with numpy.max and numpy.min) could be used to make it faster.
+2) Add permanent DB to store data for analytics. (Celery is used to make DB operations via async task queue).
+3) Identify possible arbitrage scenarios based on quantity and priced.
 
 ## License
 
